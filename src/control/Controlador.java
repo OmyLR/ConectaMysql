@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import DAO.DAOUsuarios;
 import modelos.Libro;
+import modelos.Mensaje;
+import modelos.TiposMensje;
 import modelos.Usuario;
 import utilidades.Conexion;
 
@@ -54,8 +56,9 @@ public class Controlador extends HttpServlet {
 				case "3":
 					ruta = "login.jsp";
 					break;
-				case "4":
-					opcion4();
+				case "accessLogin":
+					opcion4(request);
+					ruta = "login.jsp";
 					break;
 			}
 			
@@ -77,7 +80,7 @@ public class Controlador extends HttpServlet {
 	
 	private void opcion1(HttpServletRequest request) {
 		Connection cnx = Conexion.conectar("localhost:3306", "tienda", "root", "");
-		String mensaje = "Error de conexión...";
+		String mensaje = "Error de conexiï¿½n...";
 		request.setAttribute("mensaje", mensaje);
 	}
 	
@@ -86,13 +89,19 @@ public class Controlador extends HttpServlet {
 		request.getSession().setAttribute("libros", libros);
 	}
 	
-	private void opcion4() {
+	private void opcion4(HttpServletRequest request) {
 		DAOUsuarios controller = new DAOUsuarios();
-		Usuario user = new Usuario();
-		user.setClave("admin2");
-		user.setId(1);
-		user.setUsuario("admin");
-		controller.editUser(user);
+		Usuario user = controller.getUserLogin(request.getParameter("user"), request.getParameter("pass"));
+		Mensaje mensaje = new Mensaje();
+		if(user == null) {
+			mensaje.setMensaje("Usuario no Existente");
+			mensaje.setTipo(TiposMensje.WARNING);
+			request.setAttribute("mensaje", mensaje);
+		} else {
+			mensaje.setMensaje("Usuario Conectado!!");
+			mensaje.setTipo(TiposMensje.SUCCESS);
+			request.setAttribute("mensaje", mensaje);
+		}
 	}
 
 }

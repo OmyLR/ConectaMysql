@@ -40,7 +40,7 @@ public class DAOUsuarios {
 	}
 	
 	public Usuario getUserLogin(String user, String pass) {
-		sql = "Select * from usuarios where usuario = "+user+" && clave= "+pass;
+		sql = "Select * from usuarios where usuario = '"+user+"' && clave= '"+pass+"'";
 		try {
 			execSql(sql);
 			if(rs.next()) {
@@ -79,23 +79,49 @@ public class DAOUsuarios {
 	}
 	public void editUser(Usuario usuario) {
 		sql = "Update usuarios "
-				+ "set clave = "+usuario.getClave()
-				+ "set usuario = "+usuario.getUsuario()
-				+" where id = "+usuario.getId();
+				+ "set clave = '"+usuario.getClave()
+				+ "', usuario = '"+usuario.getUsuario()
+				+"' where id = "+usuario.getId();
 		try {
-			execSql(sql);
+			updateSql(sql);
 			System.out.println("Ejecutado!!");
 		}catch(SQLException e) {
-			
+			e.printStackTrace();
 		}
 	}
-	public void deleteUser(int id) {}
-	public void insertUser(Usuario usuario) {}
+	public void deleteUser(int id) {
+		sql = "Delete from usuarios where id ="+id;
+		try {
+			updateSql(sql);
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void insertUser(Usuario usuario) {
+		sql = "Insert into usuarios (usuario, clave) "
+				+ "values ('"
+				+ usuario.getUsuario()
+				+"', '"+usuario.getClave()
+				+ "')";
+		try {
+			execSql(sql);
+			cleanResultSet();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	
 	private void execSql(String sql) throws SQLException {
 		stmt = conex.createStatement();
 		rs = stmt.executeQuery(sql);
+	}
+	
+	private void updateSql(String sql) throws SQLException {
+		stmt = conex.createStatement();
+		stmt.executeUpdate(sql);
 	}
 	
 	private void cleanResultSet() {
